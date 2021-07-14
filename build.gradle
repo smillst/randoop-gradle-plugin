@@ -1,0 +1,33 @@
+plugins {
+    id 'java-gradle-plugin'
+}
+
+group 'com.github.randoop'
+version '0.0.1'
+
+gradlePlugin {
+    plugins {
+        randoopPlugin {
+            id = 'com.github.randoop'
+            displayName = 'Randoop Gradle Plugin'
+            implementationClass = 'com.github.randoop.RandoopPlugin'
+        }
+    }
+}
+
+repositories {
+  mavenCentral()
+}
+
+dependencies {
+  testImplementation gradleTestKit()
+}
+
+dependencies {
+  testImplementation("org.junit.jupiter:junit-jupiter-api:5.7.1")
+  testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine")
+}
+
+tasks.withType(Test).configureEach {
+  useJUnitPlatform()
+}
