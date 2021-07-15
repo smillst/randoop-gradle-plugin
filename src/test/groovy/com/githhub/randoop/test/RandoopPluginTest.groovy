@@ -1,5 +1,7 @@
 package com.githhub.randoop.test
 
+import org.gradle.launcher.daemon.protocol.Build
+import org.gradle.testkit.runner.BuildResult
 import org.gradle.testkit.runner.GradleRunner
 import org.junit.Rule
 import org.junit.rules.TemporaryFolder
@@ -17,10 +19,10 @@ class RandoopPluginTest extends Specification {
 //    '4.9',
 //    '4.10',
 //    '5.0',
-    '5.5',
-    '6.0',
-    '6.4',
-    '6.8',
+//    '5.5',
+//    '6.0',
+//    '6.4',
+//    '6.8',
       '7.1'
 ]
 
@@ -31,12 +33,12 @@ class RandoopPluginTest extends Specification {
     buildFile = testProjectDir.newFile("build.gradle")
   }
 
-  @Unroll def "test applying plugin"() {
+  @Unroll def "test applying plugin without Java plugin"() {
     given:
     buildFile <<
         """
         plugins {
-          id 'com.github.randoop' 
+          id 'com.github.randoop'
         }
 
         repositories {
@@ -47,14 +49,77 @@ class RandoopPluginTest extends Specification {
       """.stripIndent().trim()
 
     when:
-    GradleRunner.create()
+    BuildResult result = GradleRunner.create()
         .withGradleVersion(gradleVersion)
         .withProjectDir(testProjectDir.root)
         .withPluginClasspath()
+        .withArguments("-info")
         .build()
 
     then:
-    noExceptionThrown()
+    result.output.contains('Java plugin not found, Randoop plugin did not create any tasks')
+
+    where:
+    gradleVersion << TESTED_GRADLE_VERSIONS
+  }
+
+  @Unroll def "test applying plugin with Java plugin"() {
+    given:
+    buildFile <<
+        """
+        plugins {
+          id 'java'
+          id 'com.github.randoop'
+        }
+
+        repositories {
+          maven {
+            mavenLocal()
+          }
+        }
+      """.stripIndent().trim()
+
+    when:
+    BuildResult result = GradleRunner.create()
+        .withGradleVersion(gradleVersion)
+        .withProjectDir(testProjectDir.root)
+        .withPluginClasspath()
+        .withArguments("-info")
+        .build()
+
+    then:
+    result.output.contains('Java Plugin found. Adding GenerateTests tasks.')
+
+    where:
+    gradleVersion << TESTED_GRADLE_VERSIONS
+  }
+
+  @Unroll def "test applying plugin with Java plugin after Randoop"() {
+    given:
+    buildFile <<
+        """
+        plugins {
+          id 'com.github.randoop'
+          id 'java'
+        }
+
+        repositories {
+          maven {
+            mavenLocal()
+          }
+        }
+      """.stripIndent().trim()
+
+    when:
+    BuildResult result = GradleRunner.create()
+        .withGradleVersion(gradleVersion)
+        .withProjectDir(testProjectDir.root)
+        .withPluginClasspath()
+        .withArguments("-info")
+        .build()
+
+    then:
+    result.output.contains('Java Plugin found. Adding GenerateTests tasks.')
 
     where:
     gradleVersion << TESTED_GRADLE_VERSIONS

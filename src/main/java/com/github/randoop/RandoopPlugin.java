@@ -3,6 +3,7 @@ package com.github.randoop;
 import java.io.File;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Optional;
 import org.gradle.api.Plugin;
 import org.gradle.api.Project;
 import org.gradle.api.Task;
@@ -10,15 +11,18 @@ import org.gradle.api.artifacts.Configuration;
 import org.gradle.api.file.RegularFile;
 import org.gradle.api.file.RegularFileProperty;
 import org.gradle.api.internal.file.ManagedFactories.RegularFilePropertyManagedFactory;
+import org.gradle.api.logging.Logger;
+import org.gradle.api.logging.Logging;
 import org.gradle.api.plugins.JavaPlugin;
 import org.gradle.api.provider.Provider;
 import org.gradle.api.tasks.JavaExec;
 import org.gradle.api.tasks.SourceSet;
 import org.gradle.api.tasks.SourceSetContainer;
+import org.gradle.internal.impldep.com.esotericsoftware.minlog.Log;
 import org.gradle.jvm.tasks.Jar;
 
 public class RandoopPlugin implements Plugin<Project> {
-
+    private final static Logger LOG = Logging.getLogger(RandoopPlugin.class);
     /**
      * Latest version of Randoop to use by default.
      */
@@ -40,13 +44,18 @@ public class RandoopPlugin implements Plugin<Project> {
         project.getTasks().withType(GenerateTests.class).configureEach(
                 generateTests -> generateTests.getRandoopClassPath().from(randoop));
 
-        // For each source set add a generateTests tasks.
-        project.getPlugins().apply(JavaPlugin.class);
-        SourceSetContainer sourceSets = project.getExtensions().getByType(SourceSetContainer.class);
-        sourceSets.forEach(sourceSet -> createGenerateTestTaskForSourceSet(project, sourceSet));
-
-
-
+        project.getPluginManager().withPlugin("java", javaPlugin -> {
+            LOG.info("Java Plugin found. Adding GenerateTests tasks.");
+            // For each source set add a generateTests tasks.
+            SourceSetContainer sourceSets = project.getExtensions()
+                    .getByType(SourceSetContainer.class);
+            sourceSets.forEach(sourceSet -> createGenerateTestTaskForSourceSet(project, sourceSet));
+        });
+        project.afterEvaluate(x -> {
+            if (!project.getPluginManager().hasPlugin("java")) {
+                LOG.warn("Java plugin not found, Randoop plugin did not create any tasks.");
+            }
+        });
 
         // UrlVerifierExtension extension = project.getExtensions().create("verification", UrlVerifierExtension.class);
         //        UrlVerify verifyUrlTask = project.getTasks().create("verifyUrl", UrlVerify.class);
