@@ -1,24 +1,15 @@
 package com.github.randoop;
 
 import java.io.File;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Optional;
 import org.gradle.api.Plugin;
 import org.gradle.api.Project;
-import org.gradle.api.Task;
 import org.gradle.api.artifacts.Configuration;
 import org.gradle.api.file.RegularFile;
-import org.gradle.api.file.RegularFileProperty;
-import org.gradle.api.internal.file.ManagedFactories.RegularFilePropertyManagedFactory;
 import org.gradle.api.logging.Logger;
 import org.gradle.api.logging.Logging;
-import org.gradle.api.plugins.JavaPlugin;
 import org.gradle.api.provider.Provider;
-import org.gradle.api.tasks.JavaExec;
 import org.gradle.api.tasks.SourceSet;
 import org.gradle.api.tasks.SourceSetContainer;
-import org.gradle.internal.impldep.com.esotericsoftware.minlog.Log;
 import org.gradle.jvm.tasks.Jar;
 
 public class RandoopPlugin implements Plugin<Project> {
@@ -42,7 +33,7 @@ public class RandoopPlugin implements Plugin<Project> {
                 });
 
         project.getTasks().withType(GenerateTests.class).configureEach(
-                generateTests -> generateTests.getRandoopClassPath().from(randoop));
+                generateTests -> generateTests.getRandoopJar().from(randoop));
 
         project.getPluginManager().withPlugin("java", javaPlugin -> {
             LOG.info("Java Plugin found. Adding GenerateTests tasks.");

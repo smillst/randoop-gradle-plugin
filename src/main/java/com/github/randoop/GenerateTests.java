@@ -2,7 +2,6 @@ package com.github.randoop;
 
 import org.gradle.api.file.ConfigurableFileCollection;
 import org.gradle.api.file.DirectoryProperty;
-import org.gradle.api.file.FileCollection;
 import org.gradle.api.file.RegularFileProperty;
 import org.gradle.api.provider.Property;
 import org.gradle.api.tasks.Input;
@@ -16,7 +15,7 @@ import org.gradle.api.tasks.OutputDirectory;
  */
 public abstract class GenerateTests extends JavaExec {
     @InputFiles
-    abstract ConfigurableFileCollection getRandoopClassPath();
+    abstract ConfigurableFileCollection getRandoopJar();
 
     /**
      *
@@ -42,11 +41,10 @@ public abstract class GenerateTests extends JavaExec {
 
     public GenerateTests() {
         getMainClass().set("randoop.main.Main");
-        getEmitErrorRevealingTests().convention(true);
     }
     @Override
     public void exec(){
-        setClasspath(getRandoopClassPath());
+        classpath(getRandoopJar());
         // The Jar file to use must be explicitly on the classpath.
         classpath(getTestJar().get());
         args("gentests");
@@ -56,7 +54,7 @@ public abstract class GenerateTests extends JavaExec {
         args("--progressintervalsteps=-1");
         args("--junit-output-dir");
         args(getOutputDir().get().getAsFile().getAbsolutePath());
-        if (!getEmitErrorRevealingTests().get()) {
+        if (!getEmitErrorRevealingTests().getOrElse(true)) {
             args("--no-error-revealing-tests=true");
         }
 
