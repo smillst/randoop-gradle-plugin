@@ -37,6 +37,7 @@ public abstract class GenerateTests extends JavaExec {
      * @return the directory where the tests are written
      */
     @OutputDirectory
+    // TODO: This should output in a different directory every time.
     abstract DirectoryProperty getOutputDir();
 
     public GenerateTests() {
@@ -58,6 +59,7 @@ public abstract class GenerateTests extends JavaExec {
         if (!getEmitErrorRevealingTests().get()) {
             args("--no-error-revealing-tests=true");
         }
+
         super.exec();
     }
 }

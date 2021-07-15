@@ -1,41 +1,62 @@
-package com.githhub.randoop.test;
+package com.githhub.randoop.test
 
 import org.gradle.testkit.runner.GradleRunner
 import org.junit.Rule
 import org.junit.rules.TemporaryFolder
 import spock.lang.Specification
+import spock.lang.Unroll;
 
-import static org.gradle.testkit.runner.TaskOutcome.SUCCESS
 
-class UrlVerifierPluginFunctionalTest extends Specification {
+
+class RandoopPluginTest extends Specification {
+
+  static final List<String> TESTED_GRADLE_VERSIONS = [
+//    '3.4',
+//    '4.0',
+//    '4.8',
+//    '4.9',
+//    '4.10',
+//    '5.0',
+    '5.5',
+    '6.0',
+    '6.4',
+    '6.8',
+      '7.1'
+]
+
   @Rule TemporaryFolder testProjectDir = new TemporaryFolder()
-  File buildFile
+  def buildFile
 
-  def setup() {
-    buildFile = testProjectDir.newFile('build.gradle')
-    buildFile << """
-            plugins {
-                id 'org.myorg.url-verifier'
-            }
-        """
+  def "setup"() {
+    buildFile = testProjectDir.newFile("build.gradle")
   }
 
-  def "can successfully configure URL through extension and verify it"() {
-    buildFile << """
-            verification {
-                url = 'https://www.google.com/'
-            }
+  @Unroll def "test applying plugin"() {
+    given:
+    buildFile <<
         """
+        plugins {
+          id 'com.github.randoop' 
+        }
+
+        repositories {
+          maven {
+            mavenLocal()
+          }
+        }
+      """.stripIndent().trim()
 
     when:
-    def result = GradleRunner.create()
+    GradleRunner.create()
+        .withGradleVersion(gradleVersion)
         .withProjectDir(testProjectDir.root)
-        .withArguments('verifyUrl')
         .withPluginClasspath()
         .build()
 
     then:
-    result.output.contains("Successfully resolved URL 'https://www.google.com/'")
-    result.task(":verifyUrl").outcome == SUCCESS
+    noExceptionThrown()
+
+    where:
+    gradleVersion << TESTED_GRADLE_VERSIONS
   }
 }
