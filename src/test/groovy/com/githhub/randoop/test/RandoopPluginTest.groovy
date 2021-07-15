@@ -1,6 +1,5 @@
 package com.githhub.randoop.test
 
-import org.gradle.launcher.daemon.protocol.Build
 import org.gradle.testkit.runner.BuildResult
 import org.gradle.testkit.runner.GradleRunner
 import org.junit.Rule
