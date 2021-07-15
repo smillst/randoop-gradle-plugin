@@ -26,4 +26,22 @@ class BasicSpecification extends Specification{
   def "setup"() {
     buildFile = testProjectDir.newFile("build.gradle")
   }
+
+  /**
+   * Returns a build file that applies randoop and java plugins.
+   * @return a build file that applies randoop and java plugins
+   */
+   static def basicBuildFile() {
+    """
+    plugins {
+      id "java"
+      id "com.github.randoop"
+    }
+
+    repositories {
+        mavenLocal()
+        mavenCentral()
+    }
+    """.stripIndent()
+  }
 }

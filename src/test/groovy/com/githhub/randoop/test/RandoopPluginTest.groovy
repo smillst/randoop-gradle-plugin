@@ -40,19 +40,7 @@ class RandoopPluginTest extends BasicSpecification {
 
   @Unroll def "test applying plugin with Java plugin"() {
     given:
-    buildFile <<
-        """
-        plugins {
-          id 'java'
-          id 'com.github.randoop'
-        }
-
-        repositories {
-          maven {
-            mavenLocal()
-          }
-        }
-      """.stripIndent().trim()
+    buildFile << basicBuildFile()
 
     when:
     BuildResult result = GradleRunner.create()
