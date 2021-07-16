@@ -48,13 +48,6 @@ public class RandoopPlugin implements Plugin<Project> {
             }
         });
 
-        // UrlVerifierExtension extension = project.getExtensions().create("verification", UrlVerifierExtension.class);
-        //        UrlVerify verifyUrlTask = project.getTasks().create("verifyUrl", UrlVerify.class);
-        //        verifyUrlTask.getUrl().set(extension.getUrl());
-//        RandoopExtension randoopExtension = project.getExtensions().create("randoop", RandoopExtension.class);
-//        randoopExtension.getHello().convention("Hello");
-//        project.getTasks().create("runRandoop").doFirst(x -> System.out.println( randoopExtension.getHello().get()+" world!") );
-
     }
 
     /**

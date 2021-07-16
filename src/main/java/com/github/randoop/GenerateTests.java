@@ -8,6 +8,7 @@ import org.gradle.api.tasks.Input;
 import org.gradle.api.tasks.InputFile;
 import org.gradle.api.tasks.InputFiles;
 import org.gradle.api.tasks.JavaExec;
+import org.gradle.api.tasks.Optional;
 import org.gradle.api.tasks.OutputDirectory;
 
 /**
@@ -22,6 +23,7 @@ public abstract class GenerateTests extends JavaExec {
      * @return
      */
     @Input
+    @Optional
     abstract Property<Boolean> getEmitErrorRevealingTests();
 
     /**
@@ -29,6 +31,7 @@ public abstract class GenerateTests extends JavaExec {
      * @return the jar to generate tests for
      */
     @InputFile
+    @Optional
     abstract RegularFileProperty getTestJar();
 
     /**
@@ -37,6 +40,7 @@ public abstract class GenerateTests extends JavaExec {
      */
     @OutputDirectory
     // TODO: This should output in a different directory every time.
+    @Optional // TODO: This should not be optional.
     abstract DirectoryProperty getOutputDir();
 
     public GenerateTests() {
@@ -45,15 +49,20 @@ public abstract class GenerateTests extends JavaExec {
     @Override
     public void exec(){
         classpath(getRandoopJar());
-        // The Jar file to use must be explicitly on the classpath.
-        classpath(getTestJar().get());
+
         args("gentests");
-        args("--testjar");
-        args(getTestJar().get());
+        if(getTestJar().isPresent()) {
+            // The Jar file to use must be explicitly on the classpath.
+            classpath(getTestJar().get());
+            args("--testjar");
+            args(getTestJar().get());
+        }
         args("--time-limit=15");
         args("--progressintervalsteps=-1");
-        args("--junit-output-dir");
-        args(getOutputDir().get().getAsFile().getAbsolutePath());
+        if(getOutputDir().isPresent()) {
+            args("--junit-output-dir");
+            args(getOutputDir().get().getAsFile().getAbsolutePath());
+        }
         if (!getEmitErrorRevealingTests().getOrElse(true)) {
             args("--no-error-revealing-tests=true");
         }
