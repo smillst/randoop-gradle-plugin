@@ -156,4 +156,32 @@ class GenerateTestsTaskTest extends BasicSpecification {
     then:
     result.output.contains("Randoop for Java version \"4.2.4")
   }
+
+//  @Unroll
+//  def "Project with additional source sets"() {
+//    given:
+//    buildFile <<
+//        """
+//       ${basicBuildFile()}
+//        sourceSets {
+//          other
+//        }
+//      """.stripIndent()
+//
+//    and:
+//    def javaSrcDir = testProjectDir.newFolder("src", "main", "java")
+//    new File(javaSrcDir, "HelloWorld.java") << JavaCode.HELLO_WORLD
+//    def javaSrcOtherDir = testProjectDir.newFolder("src", "other", "java")
+//    new File(javaSrcOtherDir, "HelloWorld.java") << JavaCode.HELLO_WORLD
+//
+//    when:
+//    GradleRunner.create()
+//        .withProjectDir(testProjectDir.root)
+//        .withArguments("generateOtherTests")
+//        .withPluginClasspath()
+//        .build()
+//
+//    then:
+//    noExceptionThrown()
+//  }
 }

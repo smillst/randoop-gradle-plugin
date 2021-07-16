@@ -62,6 +62,7 @@ public class RandoopPlugin implements Plugin<Project> {
         Jar jarTask = ((Jar) project.getTasks().findByPath(sourceSet.getJarTaskName()));
         if (jarTask == null) {
             // This sourceset does not have a jar task, so don't generate tests for it.
+            LOG.info("No jar for " +sourceSet.getName());
             return;
         }
         Provider<RegularFile> testJar = jarTask.getArchiveFile();
